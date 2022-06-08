@@ -69,7 +69,8 @@ QBCore.Commands.Add("createhouse", Lang:t("info.create_house"), {{name = "price"
     if Player.PlayerData.job.name == "realestate" then
         TriggerClientEvent("qb-houses:client:createHouses", src, price, tier)
     else
-        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.realestate_only"), "error")
+        --TriggerClientEvent('QBCore:Notify', src, Lang:t("error.realestate_only"), "error")
+        TriggerClientEvent('okokNotify:Alert', src, 'Real Estate Only!', Lang:t('error.realestate_only'), 1500, 'warning')
     end
 end)
 
@@ -79,7 +80,8 @@ QBCore.Commands.Add("addgarage", Lang:t('info.add_garage'), {}, false, function(
     if Player.PlayerData.job.name == "realestate" then
         TriggerClientEvent("qb-houses:client:addGarage", src)
     else
-        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.realestate_only"), "error")
+        --TriggerClientEvent('QBCore:Notify', src, Lang:t("error.realestate_only"), "error")
+        TriggerClientEvent('okokNotify:Alert', src, 'Real Estate Only!', Lang:t('error.realestate_only'), 1500, 'warning')
     end
 end)
 
@@ -96,6 +98,7 @@ QBCore.Functions.CreateUseableItem("police_stormram", function(source, item)
         TriggerClientEvent("qb-houses:client:HomeInvasion", source)
     else
         TriggerClientEvent('QBCore:Notify', source, Lang:t("error.emergency_services"), "error")
+        TriggerClientEvent('okokNotify:Alert', source, 'Emergency Services Only!', Lang:t('error.emergency_services'), 1500, 'warning')
     end
 end)
 
@@ -185,7 +188,8 @@ RegisterNetEvent('qb-houses:server:addNewHouse', function(street, coords, price,
         decorations = {}
     }
     TriggerClientEvent("qb-houses:client:setHouseConfig", -1, Config.Houses)
-    TriggerClientEvent('QBCore:Notify', src, Lang:t("info.added_house", {value = label}))
+    --TriggerClientEvent('QBCore:Notify', src, Lang:t("info.added_house", {value = label}))
+    TriggerClientEvent('okokNotify:Alert', src, 'Added House', Lang:t('info.added_house', {value = label}), 1500, 'info')
     TriggerEvent('qb-log:server:CreateLog', 'house', Lang:t("log.house_created"), 'green', Lang:t("log.house_address", {label = label, price = price, tier = tier, agent = GetPlayerName(src)}))
 end)
 
@@ -197,7 +201,8 @@ RegisterNetEvent('qb-houses:server:addGarage', function(house, coords)
         takeVehicle = coords
     }
     TriggerClientEvent("qb-garages:client:addHouseGarage", -1, house, garageInfo)
-    TriggerClientEvent('QBCore:Notify', src, Lang:t("info.added_garage", {value = garageInfo.label}))
+    --TriggerClientEvent('QBCore:Notify', src, Lang:t("info.added_garage", {value = garageInfo.label}))
+    TriggerClientEvent('okokNotify:Alert', src, 'Added Garage', Lang:t('info.added_garage', {value = garageInfo.label}), 1500, 'info')
 end)
 
 RegisterNetEvent('qb-houses:server:viewHouse', function(house)
@@ -222,7 +227,8 @@ RegisterNetEvent('qb-houses:server:buyHouse', function(house)
 
     local isOwned = isHouseOwned(house)
     if isOwned then
-        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.already_owned"), "error")
+        --TriggerClientEvent('QBCore:Notify', src, Lang:t("error.already_owned"), "error")
+        TriggerClientEvent('okokNotify:Alert', src, 'Already Owned', Lang:t('error.already_owned'), 1500, 'error')
         CancelEvent()
         return
     end
@@ -240,9 +246,11 @@ RegisterNetEvent('qb-houses:server:buyHouse', function(house)
         pData.Functions.RemoveMoney('bank', HousePrice, "bought-house") -- 21% Extra house costs
         TriggerEvent('qb-bossmenu:server:addAccountMoney', "realestate", (HousePrice / 100) * math.random(18, 25))
         TriggerEvent('qb-log:server:CreateLog', 'house', Lang:t("log.house_purchased"), 'green', Lang:t("log.house_purchased_by", {house = house:upper(), price = HousePrice, firstname = pData.PlayerData.charinfo.firstname, lastname = pData.PlayerData.charinfo.lastname}))
-        TriggerClientEvent('QBCore:Notify', src, Lang:t("success.house_purchased"), 'success', 5000)
+        --TriggerClientEvent('QBCore:Notify', src, Lang:t("success.house_purchased"), 'success', 5000)
+        TriggerClientEvent('okokNotify:Alert', src, 'Purchased', Lang:t('success.house_purchased'), 5000, 'success')
     else
-        TriggerClientEvent('QBCore:Notify', source, Lang:t("error.not_enough_money"), "error")
+        --TriggerClientEvent('QBCore:Notify', source, Lang:t("error.not_enough_money"), "error")
+        TriggerClientEvent('okokNotify:Alert', source, 'Not Enough Money', Lang:t('error.not_enough_money'), 1500, 'error')
     end
 end)
 
@@ -273,7 +281,8 @@ RegisterNetEvent('qb-houses:server:removeHouseKey', function(house, citizenData)
         end
     end
     housekeyholders[house] = newHolders
-    TriggerClientEvent('QBCore:Notify', src, Lang:t("error.remove_key_from", {firstname = citizenData.firstname, lastname = citizenData.lastname}), 'error')
+    --TriggerClientEvent('QBCore:Notify', src, Lang:t("error.remove_key_from", {firstname = citizenData.firstname, lastname = citizenData.lastname}), 'error')
+    TriggerClientEvent('okokNotify:Alert', src, 'Remove Key', Lang:t('error.remove_key_from', {firstname = citizenData.firstname, lastname = citizenData.lastname}), 2500, 'error')
     MySQL.Async.execute('UPDATE player_houses SET keyholders = ? WHERE house = ?', {json.encode(housekeyholders[house]), house})
 end)
 
@@ -311,7 +320,8 @@ RegisterNetEvent('qb-houses:server:giveHouseKey', function(target, house)
         if housekeyholders[house] then
             for _, cid in pairs(housekeyholders[house]) do
                 if cid == tPlayer.PlayerData.citizenid then
-                    TriggerClientEvent('QBCore:Notify', src, Lang:t("error.already_keys"), 'error', 3500)
+                    --TriggerClientEvent('QBCore:Notify', src, Lang:t("error.already_keys"), 'error', 3500)
+                    TriggerClientEvent('okokNotify:Alert', src, 'Already Have Key', Lang:t('error.already_keys'), 3500, 'warning')
                     return
                 end
             end
@@ -319,7 +329,8 @@ RegisterNetEvent('qb-houses:server:giveHouseKey', function(target, house)
             MySQL.Async.execute('UPDATE player_houses SET keyholders = ? WHERE house = ?', {json.encode(housekeyholders[house]), house})
             TriggerClientEvent('qb-houses:client:refreshHouse', tPlayer.PlayerData.source)
 
-            TriggerClientEvent('QBCore:Notify', tPlayer.PlayerData.source, Lang:t("success.recieved_key", {value = Config.Houses[house].adress}), 'success', 2500)
+            --TriggerClientEvent('QBCore:Notify', tPlayer.PlayerData.source, Lang:t("success.recieved_key", {value = Config.Houses[house].adress}), 'success', 2500)
+            TriggerClientEvent('okokNotify:Alert', tPlayer.PlayerData.source, 'Recieved Key', Lang:t('success.recieved_key', {value = Config.Houses[house].adress}), 2500, 'success')
         else
             local sourceTarget = QBCore.Functions.GetPlayer(src)
             housekeyholders[house] = {
@@ -328,10 +339,12 @@ RegisterNetEvent('qb-houses:server:giveHouseKey', function(target, house)
             housekeyholders[house][#housekeyholders[house]+1] = tPlayer.PlayerData.citizenid
             MySQL.Async.execute('UPDATE player_houses SET keyholders = ? WHERE house = ?', {json.encode(housekeyholders[house]), house})
             TriggerClientEvent('qb-houses:client:refreshHouse', tPlayer.PlayerData.source)
-            TriggerClientEvent('QBCore:Notify', tPlayer.PlayerData.source, Lang:t("success.recieved_key", {value = Config.Houses[house].adress}), 'success', 2500)
+            --TriggerClientEvent('QBCore:Notify', tPlayer.PlayerData.source, Lang:t("success.recieved_key", {value = Config.Houses[house].adress}), 'success', 2500)
+            TriggerClientEvent('okokNotify:Alert', tPlayer.PlayerData.source, 'Recieved Key', Lang:t('success.recieved_key', {value = Config.Houses[house].adress}), 2500, 'success')
         end
     else
-        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.something_wrong"), 'error', 2500)
+        --TriggerClientEvent('QBCore:Notify', src, Lang:t("error.something_wrong"), 'error', 2500)
+        TriggerClientEvent('okokNotify:Alert', src, 'Something Wrong', Lang:t('error.something_wrong'), 2500, 'error')
     end
 end)
 
@@ -379,7 +392,8 @@ QBCore.Functions.CreateCallback('qb-houses:server:buyFurniture', function(source
         pData.Functions.RemoveMoney('bank', price, "bought-furniture")
         cb(true)
     else
-        TriggerClientEvent('QBCore:Notify', src, Lang:t("error.not_enough_money"), "error")
+        --TriggerClientEvent('QBCore:Notify', src, Lang:t("error.not_enough_money"), "error")
+        TriggerClientEvent('okokNotify:Alert', src, 'Not Enough Money', Lang:t('error.not_enough_money'), 2500, 'warning')
         cb(false)
     end
 end)
